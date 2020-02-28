@@ -19,6 +19,7 @@ new PipelineStack(app, 'PipelineStackDev', {
         account: process.env.CDK_DEFAULT_ACCOUNT,
         region: process.env.CDK_DEFAULT_REGION,
     },
+    prodManualApprovalStage: false,
 });
 
 new PipelineStack(app, 'PipelineStackProd', {
@@ -33,4 +34,8 @@ new PipelineStack(app, 'PipelineStackProd', {
         account: process.env.CDK_DEFAULT_ACCOUNT,
         region: process.env.CDK_DEFAULT_REGION,
     },
+    prodManualApprovalStage: true,
+    prodManualApprovalSnsEmail: [
+        'who@example.com',
+    ],
 });

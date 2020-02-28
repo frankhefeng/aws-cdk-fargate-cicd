@@ -7,10 +7,7 @@ import codebuild = require('@aws-cdk/aws-codebuild');
 import codepipeline = require('@aws-cdk/aws-codepipeline');
 import codepipeline_actions = require('@aws-cdk/aws-codepipeline-actions');
 import ecs_patterns = require('@aws-cdk/aws-ecs-patterns');
-import events = require("@aws-cdk/aws-events")
-import event_targets = require("@aws-cdk/aws-events-targets");
 import * as logs from '@aws-cdk/aws-logs';
-import { Schedule } from '@aws-cdk/aws-applicationautoscaling';
 import sns = require('@aws-cdk/aws-sns');
 import { AppResource } from './app-resource';
 
@@ -22,23 +19,26 @@ export interface PipelineStackProps extends cdk.StackProps {
   codeCommitRepoName: string;
   gitBranch: string;
   ecrRepoName: string;
+  prodManualApprovalStage?: boolean,
+  prodManualApprovalSnsEmail?: string[],
 }
 
 export class PipelineStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props: PipelineStackProps) {
     super(scope, id, props);
 
-    // The code that defines your stack goes here
     const stackPrefix = (props.prodStage ? 'prod' : 'dev') + '-' + props.appName;
     const removalPolicy = props.prodStage ? cdk.RemovalPolicy.RETAIN : cdk.RemovalPolicy.DESTROY
 
     var vpc = null
     if (props.prodStage) {
+      //Use NAT Gateway by CDK default in production env
       vpc = new ec2.Vpc(this, 'vpc', {
         maxAzs: props.maxAzs,
         cidr: props.cidr,
       })
     } else {
+      //Use NAT instances in development env to save costs
       const natGatewayProvider = ec2.NatProvider.instance({
         instanceType: new ec2.InstanceType('t3.micro')
       });
@@ -159,10 +159,8 @@ export class PipelineStack extends cdk.Stack {
       });
       const manualApprovalAction = new codepipeline_actions.ManualApprovalAction({
         actionName: 'Approve',
-        notificationTopic: new sns.Topic(this, props.appName + ' deployment manual approval'), // optional
-        notifyEmails: [
-          'who@example.com',
-        ],
+        notificationTopic: new sns.Topic(this, props.appName + ' deployment manual approval'),
+        notifyEmails: props.prodManualApprovalSnsEmail,
         // additionalInformation: 'additional info', // optional
       });
       approveStage.addAction(manualApprovalAction);

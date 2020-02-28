@@ -24,7 +24,7 @@ new PipelineStack(app, 'PipelineStackDev', {
 
 new PipelineStack(app, 'PipelineStackProd', {
     appName: appName,
-    prodStage: false,
+    prodStage: true,
     cidr: '10.20.0.0/16',
     maxAzs: 3,
     codeCommitRepoName: codeCommitRepoName,

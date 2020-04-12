@@ -22,7 +22,7 @@ CommonStack.CodeCommitRepoUrl = ssh://git-codecommit.us-east-1.amazonaws.com/v1/
 6. In source code, git `develop` branch,  switch to `app/src` folder, and run `make` to compile Go source code to binary. Then switch to `app` folder, prepare to build Docker image and push to ECR. This is only necessary for first deployment of CodePipeline. 
 7. In AWS console, Go to ECR service, and find new created `dev-example-app` repository, then click `View push commands` button, execute all commands under folder `app`. 
 8. Go to `infra/pipeline` folder, run `npm run build` to compile the scripts, then run `cdk deploy PipelineStackDev`. This will create CI/CD pipeline for develop environment.
-9.  In source code, switch to git `master` branch, repeat steps 5~8, but replace all `dev` to `prod` to create CI/CD pipeline for production  environment. There is an extra manual approval stage in production pipeline, p
+9.  In source code, switch to git `master` branch, repeat steps 5~8, but replace all `dev` to `prod` to create CI/CD pipeline for production  environment. There is an extra manual approval stage in production pipeline.
 
 ## Workflow
 1. Develop features under git `develop` branch.  Create necessary AWS resources such as DynamoDB, RDS, in `app-resource.ts`, push code to CodeCommit, then CodePipeline will deploy latest source code automatically.
